@@ -1,14 +1,16 @@
 document.getElementById("startTyping").addEventListener("click", function() {
     const xpath = document.getElementById("xpathInput").value;
-    executeTyping(xpath);
+    const delay = parseInt(document.getElementById("delayInput").value) || 100;
+    executeTyping(xpath, delay);
 });
 
 document.getElementById("startPredefinedTyping").addEventListener("click", function() {
     const predefinedXpath = "/html/body/div[2]/div/main/div/div[1]/div/div/div[2]/div[2]/div[1]/div/div/div";
-    executeTyping(predefinedXpath);
+    const delay = parseInt(document.getElementById("delayInput").value) || 100;
+    executeTyping(predefinedXpath, delay);
 });
 
-function executeTyping(xpath) {
+function executeTyping(xpath, delay) {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
         const tabId = tabs[0].id;
 
@@ -21,14 +23,12 @@ function executeTyping(xpath) {
             const combinedWords = results[0].result;
             if (combinedWords) {  // Only attempt typing if there's text extracted
                 chrome.debugger.attach({tabId: tabId}, '1.2', function() {
-                    typeText(tabId, combinedWords, 0);
+                    typeText(tabId, combinedWords, 0, delay);
                 });
             }
         });
     });
 }
-
-
 function extractTextFromXPath(xpath) {
     let element = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
@@ -59,7 +59,7 @@ function extractTextFromXPath(xpath) {
 // ... [Rest of the typing function remains the same]
 
 
-function typeText(tabId, combinedWords, index) {
+function typeText(tabId, combinedWords, index, delay) {
     if (index >= combinedWords.length) {
         chrome.debugger.detach({tabId: tabId});
         return;
@@ -91,13 +91,14 @@ function typeText(tabId, combinedWords, index) {
                 key: ' '
             }, function() {
                 setTimeout(() => {
-                    typeText(tabId, combinedWords, index + 1);
-                }, 0.000000000000000000000000000000000000000000001);
+                    typeText(tabId, combinedWords, index + 1, delay);
+                }, delay);
             });
         } else { // If the character wasn't a space, just continue
             setTimeout(() => {
-                typeText(tabId, combinedWords, index + 1);
-            }, 0.0000000000000000000000000000000000000000000001);
+                typeText(tabId, combinedWords, index + 1, delay);
+            }, delay);
         }
     });
 }
+
