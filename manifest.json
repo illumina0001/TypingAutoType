@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "Typing Helper",
+    "version": "1.0",
+    "description": "Automate typing from an XPath to a page using chrome.debugger",
+    "background": {
+      "service_worker": "background.js"
+    },
+    "permissions": ["debugger", "activeTab", "scripting"],
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  
